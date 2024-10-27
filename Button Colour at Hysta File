@@ -1,0 +1,14 @@
+Private Sub Grey_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+
+     'Show the colored button when hovering over the inactive button
+    Green.Visible = True
+    Grey.Visible = False
+End Sub
+
+Private Sub Green_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+    ' Show the inactive button when moving away from the colored button
+    Green.Visible = False
+    Grey.Visible = True
+End Sub
+
+
