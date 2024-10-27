@@ -1,0 +1,66 @@
+Sub EarliestTimeMsg()
+    Dim ws As Worksheet
+    Dim EarliestTime As Date, TimeNow As Date
+    Dim Days As Long, Hours As Long, Minutes As Long, TotalSeconds As Long
+    Dim cell As Range, CellCheck As Range
+    Dim FirstRun As Boolean, allConditionsMet As Boolean
+    Dim conditionCount As Long, totalCells As Long
+
+   
+    Set ws = ThisWorkbook.Sheets("Prep")
+
+    
+    allConditionsMet = True
+    conditionCount = 0
+    totalCells = 0
+
+   
+    For Each CellCheck In ws.Range("C10:C100, I10:I100, O10:O100, U10:U100, AA10:AA100, AG10:AG100")
+        If Not IsEmpty(CellCheck.Value) Then
+            totalCells = totalCells + 1
+            If CellCheck.Value = "Clean" Or CellCheck.Value = "In_Use" Or CellCheck.Value = "In_CIP" Or CellCheck.Value = "Sanitized" Then
+                conditionCount = conditionCount + 1
+            Else
+                allConditionsMet = False
+                MsgBox "Atleast one of the Hysta along the pathway is not at the required State."
+                Exit Sub
+            End If
+     
+        End If
+    Next CellCheck
+
+    
+    If allConditionsMet And conditionCount = totalCells Then
+        FirstRun = True
+        EarliestTime = #12/31/2040 12:01:00 AM#
+
+        
+        For Each cell In ws.Range("F10:F100, L10:L100, R10:R100, X10:X100, AD10:AD100, AJ10:AJ100")
+            If IsDate(cell.Value) Then
+                If FirstRun Or cell.Value < EarliestTime Then
+                    EarliestTime = cell.Value
+                    FirstRun = False
+                End If
+            End If
+        Next cell
+        
+       
+        If Not FirstRun Then
+            TimeNow = Now
+            TotalSeconds = DateDiff("s", TimeNow, EarliestTime)
+            Days = Int(TotalSeconds \ 86400)
+            Hours = Int((TotalSeconds Mod 86400) \ 3600)
+            Minutes = Int((TotalSeconds Mod 3600) \ 60)
+
+           
+            If TotalSeconds > 0 And TotalSeconds < 8640000 Then
+                MsgBox "There are " & Days & " Days " & Hours & " Hours " & Minutes & " Minutes left to initiate transfer."
+            ElseIf TotalSeconds >= 8640000 Then
+                MsgBox "Please perform Hysta Check First"
+            Else
+                MsgBox "CHT has exceeded 48hrs. Please trace the pathway from USP to SHF again & refer to CV_CDHTS_00786733: SGBO – Cleaning Validation Status of MU Equipment Version 6.0 for actual CHT"
+            End If
+        End If
+   End If
+End Sub
+
